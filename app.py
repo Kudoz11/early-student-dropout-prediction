@@ -19,10 +19,13 @@ st.markdown("""
 def load_model():
     return joblib.load('xgboost_student_model.pkl')
 
+model = None
 try:
     model = load_model()
-except:
-    st.error("Model file 'xgboost_student_model.pkl' not found!")
+except FileNotFoundError:
+    st.error("Model file 'xgboost_student_model.pkl' not found! Please make sure it is in the same folder as this app.")
+except Exception as e:
+    st.error(f"Error loading model: {e}")
 
 # 2. CONSTANTS
 FEATURE_NAMES = [
@@ -58,9 +61,14 @@ with st.sidebar:
 st.title("🎓 Student Persistence Prediction System")
 st.info("This system uses a tuned XGBoost model to predict student dropout risk based on early-semester indicators.")
 
-if st.button("🚀 Analyze Student Risk"):
+# Disable button functionality if model failed to load
+analyze_button = st.button("🚀 Analyze Student Risk")
+
+if analyze_button and model is None:
+    st.warning("Model is not loaded, so predictions cannot be generated. Please check the model file on the server.")
+elif analyze_button and model is not None:
     # Create baseline
-    input_vector = np.array(MEDIAN_VALUES).copy()
+    input_vector = np.array(MEDIAN_VALUES, dtype=float).copy()
     
     # Map inputs to correct indices
     input_vector[13] = 1.0 if debtor == "Yes" else 0.0
@@ -72,50 +80,56 @@ if st.button("🚀 Analyze Student Risk"):
     input_vector[23] = float(grade)
     
     # Prediction
-    test_df = pd.DataFrame([input_vector], columns=FEATURE_NAMES)
-    prob = model.predict_proba(test_df)[0]
-    dropout_prob = float(prob[1]) # Safety for progress bar
-    grad_prob = float(prob[0])
+    try:
+        test_df = pd.DataFrame([input_vector], columns=FEATURE_NAMES)
+        prob = model.predict_proba(test_df)[0]
+        dropout_prob = float(prob[1])
+        grad_prob = float(prob[0])
+    except Exception as e:
+        st.error(f"Error during prediction: {e}")
+        dropout_prob = None
+        grad_prob = None
 
-    # --- DISPLAY RESULTS ---
-    st.markdown("---")
-    res_col1, res_col2 = st.columns([1, 1])
+    if dropout_prob is not None:
+        # --- DISPLAY RESULTS ---
+        st.markdown("---")
+        res_col1, res_col2 = st.columns([1, 1])
 
-    with res_col1:
-        # Balanced Threshold: 0.65 for Dropout
-        if dropout_prob > 0.65:
-            st.error("### ⚠️ Result: High Attrition Risk")
-            st.metric("Prediction", "DROPOUT", f"{dropout_prob*100:.1f}% Risk", delta_color="inverse")
-        else:
-            st.success("### ✅ Result: Likely to Graduate")
-            st.metric("Prediction", "GRADUATE", f"{grad_prob*100:.1f}% Confidence")
+        with res_col1:
+            # Balanced Threshold: 0.65 for Dropout
+            if dropout_prob > 0.65:
+                st.error("### ⚠️ Result: High Attrition Risk")
+                st.metric("Prediction", "DROPOUT", f"{dropout_prob*100:.1f}% Risk", delta_color="inverse")
+            else:
+                st.success("### ✅ Result: Likely to Graduate")
+                st.metric("Prediction", "GRADUATE", f"{grad_prob*100:.1f}% Confidence")
 
-    with res_col2:
-        st.write("**Risk Analysis Meter**")
-        st.progress(dropout_prob)
-        st.caption(f"Probability of Dropout: {dropout_prob*100:.2f}% | Threshold: 65%")
+        with res_col2:
+            st.write("**Risk Analysis Meter**")
+            st.progress(min(max(dropout_prob, 0.0), 1.0))
+            st.caption(f"Probability of Dropout: {dropout_prob*100:.2f}% | Threshold: 65%")
 
-    # --- RESEARCH INSIGHTS ---
-    st.markdown("### 🔍 Strategic Recommendations")
-    rec_col1, rec_col2 = st.columns(2)
-    
-    with rec_col1:
-        st.write("**Academic Status**")
-        if approved < 4:
-            st.warning("Low credit accumulation detected. Recommend supplementary classes.")
-        elif grade > 14:
-            st.success("Strong academic standing maintained.")
-        else:
-            st.write("Average academic performance.")
+        # --- RESEARCH INSIGHTS ---
+        st.markdown("### 🔍 Strategic Recommendations")
+        rec_col1, rec_col2 = st.columns(2)
+        
+        with rec_col1:
+            st.write("**Academic Status**")
+            if approved < 4:
+                st.warning("Low credit accumulation detected. Recommend supplementary classes.")
+            elif grade > 14:
+                st.success("Strong academic standing maintained.")
+            else:
+                st.write("Average academic performance.")
 
-    with rec_col2:
-        st.write("**Financial Status**")
-        if debtor == "Yes" or tuition == "No":
-            st.error("Financial liabilities detected. Suggest meeting with financial aid office.")
-        elif scholarship == "No" and grade > 15:
-            st.info("Eligible for academic scholarship consideration.")
-        else:
-            st.write("Financial status appears stable.")
+        with rec_col2:
+            st.write("**Financial Status**")
+            if debtor == "Yes" or tuition == "No":
+                st.error("Financial liabilities detected. Suggest meeting with financial aid office.")
+            elif scholarship == "No" and grade > 15:
+                st.info("Eligible for academic scholarship consideration.")
+            else:
+                st.write("Financial status appears stable.")
 
 # --- FOOTER ---
 st.markdown("---")
