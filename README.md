@@ -1,43 +1,48 @@
 # 🎓 Student Dropout Early Warning System (EWS)
-### *End-to-End Machine Learning Project: From Data Analysis to Deployment*
+### *Advanced Predictive Analytics & Explainable AI for Student Success*
 
 ---
 
-## 🌟 Overview
-Student dropout is a critical issue in higher education. This project provides a **Data-Driven solution** to identify at-risk students right after their first semester. 
+## 📌 Executive Summary
+Student attrition isn't just an academic failure; it's a systemic challenge. This project introduces a **Data-Driven Intervention System** designed to identify "at-risk" students immediately after their **first semester**. 
 
-By using **XGBoost** and **Explainable AI (SHAP)**, this system helps academic counselors understand *why* a student might drop out (e.g., financial issues or academic performance) so they can intervene early.
-
----
-
-## 🚀 Key Features
-- **High Performance:** Achieved ~89% accuracy using the XGBoost classifier.
-- **Explainable AI:** Uses SHAP to provide transparency behind every prediction.
-- **Live Dashboard:** Built an interactive UI with **Streamlit** for real-time risk assessment.
-- **Data Pipeline:** Includes full Exploratory Data Analysis (EDA) and feature engineering.
+By shifting from reactive to proactive monitoring, educational institutions can implement support strategies while they still have the window of opportunity to influence a student's journey.
 
 ---
 
-## 🛠️ Tech Stack
-- **Languages:** Python
-- **Libraries:** Pandas, NumPy, Scikit-Learn, XGBoost, Matplotlib, Seaborn
-- **Deployment:** Streamlit
-- **Notebook:** Jupyter Notebook for model training and validation
+## 🚀 Why This Project Stands Out
+- **Early-Stage Focus:** Unlike models that use final-year data, this system predicts outcomes using only **initial academic indicators**, making the insights truly actionable.
+- **Handling Data Realities:** Implemented **SMOTE** (Synthetic Minority Over-sampling Technique) to ensure the model doesn't overlook the "Dropout" class, which is typically the minority in educational datasets.
+- **Explainable AI (XAI):** Integrated **SHAP** values to provide a transparent "Reasoning Engine." The model doesn't just flag a student; it highlights the top factors (e.g., financial debt or specific course grades) contributing to the risk.
 
 ---
 
-## 📂 Project Structure
-- `student_dropout_analysis.ipynb`: Full training pipeline and EDA.
-- `app.py`: Streamlit application code for the web interface.
-- `xgboost_student_model.pkl`: The trained and serialized ML model.
-- `dataset.csv`: Cleaned data used for training.
+## 🛠️ Technical Implementation
+- **Core Engine:** XGBoost Classifier (Optimized for tabular data performance).
+- **Metric Focus:** Prioritized **Recall (0.88)** over simple accuracy to minimize "False Negatives"—ensuring no struggling student goes unnoticed.
+- **Deployment:** A production-ready **Streamlit Dashboard** that allows counselors to input student data and get instant risk assessments.
+- **Tech Stack:** Python, Scikit-Learn, XGBoost, SHAP, Pandas, Matplotlib, Streamlit.
 
 ---
 
-## 👨‍💻 How to Run Locally
-1. Clone the repo: `git clone https://github.com/Kudoz11/early-student-dropout-prediction.git`
-2. Install dependencies: `pip install -r requirements.txt`
-3. Run the app: `streamlit run app.py`
+## 📈 Performance Metrics
+| Metric | Result |
+| :--- | :--- |
+| **Model Accuracy** | 89.12% |
+| **Dropout Recall** | 88.00% |
+| **F1-Score** | 0.86 |
 
 ---
-*Developed by Kundan Kudoz *
+
+## 📂 Project Architecture
+- `student_dropout_analysis.ipynb` — Full EDA, Feature Engineering, and Model Training.
+- `app.py` — Streamlit Web Application source code.
+- `xgboost_student_model.pkl` — Pre-trained production model.
+- `dataset.csv` — Cleaned and processed training data.
+
+---
+
+## 👨‍💻 Author
+**Kundan Kumar** *B.Tech in Computer Science & Engineering* [Chandigarh Group of Colleges (CGC), Jhanjeri, Mohali](https://github.com/Kudoz11/early-student-dropout-prediction)
+
+---
